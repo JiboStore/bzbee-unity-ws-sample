@@ -11,8 +11,12 @@ namespace Example
 		private WebSocket websocket;
 		private Notifier notifier;
 
+		private bool isOpen;
+
 		public void Update() {
-			websocket.Send ("Hello: " + DateTime.UtcNow.ToString ());
+//			if (isOpen) {
+//				websocket.Send ("Hello: " + DateTime.UtcNow.ToString ());
+//			}
 		}
 
 	public void Start()
@@ -27,9 +31,10 @@ namespace Example
       // you should create a new instance with a wss scheme WebSocket URL.
 
 			notifier = new Notifier ();
-			websocket = new WebSocket ("ws://echo.websocket.org");
+//			websocket = new WebSocket ("ws://echo.websocket.org");
+			websocket = new WebSocket("ws://localhost:9000/ws");
       using (var nf = new Notifier ())
-      using (var ws = new WebSocket ("ws://echo.websocket.org"))
+//      using (var ws = new WebSocket ("ws://echo.websocket.org"))
       //using (var ws = new WebSocket ("wss://echo.websocket.org"))
       //using (var ws = new WebSocket ("ws://localhost:4649/Echo"))
       //using (var ws = new WebSocket ("wss://localhost:5963/Echo"))
@@ -42,21 +47,29 @@ namespace Example
       {
         // Set the WebSocket events.
 
-        websocket.OnOpen += (sender, e) => websocket.Send ("Hi, there!");
+				isOpen = false;
+
+				websocket.OnOpen += (sender, e) =>  {
+					Debug.Log("hello");
+//					websocket.Send ("Hi, there!");
+				};
+
 				websocket.OnMessage += (object sender, MessageEventArgs e) => {
 					Debug.Log ("received: " + e.Data);
 				};
 				websocket.OnOpen += (object sender, EventArgs e) => {
 					Debug.Log("on open");
+					isOpen = true;
 				};
-				websocket.OnMessage += (object sender, MessageEventArgs e) => {
-					Debug.Log("on message");
-				};
+//				websocket.OnMessage += (object sender, MessageEventArgs e) => {
+//					Debug.Log("on message");
+//				};
 				websocket.OnError += (object sender, ErrorEventArgs e) => {
 					Debug.Log("on error");
 				};
 				websocket.OnClose += (object sender, CloseEventArgs e) => {
 					Debug.Log("on close");
+					isOpen = false;
 				};
 
 				websocket.Connect ();
